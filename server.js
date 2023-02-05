@@ -8,10 +8,11 @@ const multer = require("multer");
 const FormData = require("form-data");
 const mongoose = require("mongoose");
 const File = require("./models/File");
+const cors = require("cors");
 
 const upload = multer({ dest: "uploads/" });
 const app = express();
-
+app.use(cors());
 const SYNC_OUT_DIR = process.env.SYNC_OUT_DIR;
 const SYNC_IN_DIR = process.env.SYNC_IN_DIR;
 
@@ -36,8 +37,9 @@ app.post("/files", upload.single("file"), async function (req, res, next) {
   const file = fs.readFileSync(path);
   fs.writeFileSync(nodePath.join(SYNC_IN_DIR, originalname), file);
   fs.unlinkSync(path);
-  res.status(200);
-  res.send("success");
+  return res.status(200).json({
+    status: "success",
+  });
 });
 
 mongoose.set("strictQuery", false);
